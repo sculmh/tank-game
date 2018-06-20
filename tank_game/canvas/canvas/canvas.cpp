@@ -54,7 +54,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		else
 		{
 			tNow = GetTickCount();
-			if (tNow - tPre >= 40){				//刷新频率
+			if (tNow - tPre >= 10){				//刷新频率
 				if(isStart)				//游戏已经开始
 					MyPaint(hdc);
 				else
@@ -119,11 +119,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//bg = (HBITMAP)LoadImage(NULL, "bg.bmp", IMAGE_BITMAP, 650, 450, LR_LOADFROMFILE);				//背景图
 
 	//上下左右对应 0 1 2 3 
-	tankImg[0] = (HBITMAP)LoadImage(NULL, "top.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);				//坦克
-	tankImg[2] = (HBITMAP)LoadImage(NULL, "left.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);				
-	tankImg[3] = (HBITMAP)LoadImage(NULL, "right.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);				
-	tankImg[1] = (HBITMAP)LoadImage(NULL, "bottom.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);				
-	bullet = (HBITMAP)LoadImage(NULL, "bullet.bmp", IMAGE_BITMAP, 10, 10, LR_LOADFROMFILE);		
+	tankImg[0] = (HBITMAP)LoadImage(NULL, "top.bmp", IMAGE_BITMAP, 30, 60, LR_LOADFROMFILE);				//坦克
+	tankImg[2] = (HBITMAP)LoadImage(NULL, "left.bmp", IMAGE_BITMAP, 30, 60, LR_LOADFROMFILE);				
+	tankImg[3] = (HBITMAP)LoadImage(NULL, "right.bmp", IMAGE_BITMAP, 30, 60, LR_LOADFROMFILE);				
+	tankImg[1] = (HBITMAP)LoadImage(NULL, "bottom.bmp", IMAGE_BITMAP, 30, 60, LR_LOADFROMFILE);				
+	bullet = (HBITMAP)LoadImage(NULL, "bullet.bmp", IMAGE_BITMAP, 10, 20, LR_LOADFROMFILE);		
 
 	obstacle1= (HBITMAP)LoadImage(NULL, "obstacle1.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);	//障碍
 	obstacle2 = (HBITMAP)LoadImage(NULL, "obstacle2.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);
@@ -195,8 +195,9 @@ void MyPaint(HDC hdc)
 	int myPositionY = myTank.GetY();			//坦克位置
 
 	SelectObject(bufdc, tankImg[myDirection]);
-	BitBlt(mdc, myPositionX, myPositionY, 30, 30, bufdc, 0, 0, SRCCOPY);		
-	
+	//BitBlt(mdc, myPositionX, myPositionY, 30, 30, bufdc, 0, 0, SRCCOPY);		
+	BitBlt(mdc, myPositionX, myPositionY, 30, 30, bufdc, 0, 30, SRCAND);
+	BitBlt(mdc, myPositionX, myPositionY, 30, 30, bufdc, 0, 0, SRCPAINT);
 	/*
 	 * 画障碍物
 	obstacle[0].Set(50,50);
@@ -264,10 +265,10 @@ void MyPaint(HDC hdc)
 			}
 			b[i].SetX(bx);
 		}
-
 		//贴子弹
-		SelectObject(bufdc, bullet);
-		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 0, SRCCOPY);					
+		SelectObject(bufdc, bullet);		
+		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 10, SRCAND);
+		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 0, SRCPAINT);
 	}
 
 
