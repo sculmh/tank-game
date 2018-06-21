@@ -11,11 +11,13 @@
 #define OBSTACLE_NUMBER 6  //定义障碍物的个数
 
 HINSTANCE hInst;
-HBITMAP  bg,start,tankImg[4],bullet,obstacle1,obstacle2;						//图片
+HBITMAP  bg,start,tankImg[4],bullet,obstacle1,obstacle2,triangle,explain;						//图片
 HDC		hdc, mdc, bufdc;
 HWND	hWnd;
 DWORD	tPre, tNow;						//控制刷新频率
 bool isStart = false;				//游戏开始
+int triangelY = 90;				//开始界面三角形y坐标
+bool showExplain = false;			//是否显示说明图
 
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
@@ -128,7 +130,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	obstacle1= (HBITMAP)LoadImage(NULL, "obstacle1.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);	//障碍
 	obstacle2 = (HBITMAP)LoadImage(NULL, "obstacle2.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);
 	bg = (HBITMAP)LoadImage(NULL, "bg.bmp", IMAGE_BITMAP, 650, 450, LR_LOADFROMFILE);				//背景		
-
+	triangle = (HBITMAP)LoadImage(NULL, "triangle.bmp", IMAGE_BITMAP, 20, 40, LR_LOADFROMFILE);				//三角形		
+	explain = (HBITMAP)LoadImage(NULL, "explain.bmp", IMAGE_BITMAP, 300, 400, LR_LOADFROMFILE);				//三角形		
 
 	MyPaint(hdc);					//调用绘图函数
 
@@ -172,6 +175,22 @@ void StartPaint(HDC hdc)
 		//贴开始界面
 		SelectObject(bufdc, start);
 		BitBlt(mdc, 0, 0, 650, 450, bufdc, 0, 0, SRCCOPY);		
+		//BitBlt(hdc, 0, 0, 650, 450, mdc, 0, 0, SRCCOPY);
+
+		//贴三角形(245,90) (245,130)
+		SelectObject(bufdc, triangle);
+		BitBlt(mdc,245, triangelY, 20, 20, bufdc, 0, 20, SRCAND);
+		BitBlt(mdc, 245, triangelY, 20, 20, bufdc, 0, 0, SRCPAINT);
+		//贴游戏说明
+		if(showExplain == true){				//贴说明图
+			SelectObject(bufdc, explain);
+			BitBlt(mdc,120, 160, 300, 200, bufdc, 0, 200, SRCAND);
+			BitBlt(mdc, 120, 160, 300, 200, bufdc, 0, 0, SRCPAINT);
+		}
+
+		
+
+
 		BitBlt(hdc, 0, 0, 650, 450, mdc, 0, 0, SRCCOPY);
 		tPre = GetTickCount();
 		
@@ -208,18 +227,99 @@ void MyPaint(HDC hdc)
 	obstacle[5].Set(400,350);
 	 */
 	//画障碍物
+		/*
+	 * 画障碍物  SCU 形状
+	 */
+	SelectObject(bufdc,obstacle1);                               //贴第一行障碍 8个
+	BitBlt(mdc,130, 150, 30, 30, bufdc, 0, 0, SRCCOPY);	
 	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,50,50, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	BitBlt(mdc,160,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
 	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,100,50, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	BitBlt(mdc,190,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
 	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,200,60, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	BitBlt(mdc,280,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,310,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
 	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc, 300, 200, 30, 30, bufdc, 0, 0, SRCCOPY);
+	BitBlt(mdc,340,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+																	//贴第二行障碍 4个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,130,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
 	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc, 250,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	BitBlt(mdc,430,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+																	//贴第二'行障碍 4个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,130,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+																	//贴第三行障碍 6个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,130,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,160,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,190,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
 	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc, 400,350, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	BitBlt(mdc,280,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+																	//贴第四行障碍 4个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,190,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,430,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+																		//贴第四'行障碍 4个
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,190,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+																	//贴第五行障碍9个
+	SelectObject(bufdc,obstacle1);                               
+	BitBlt(mdc,130, 330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,160,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,190,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,280,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,310,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,340,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,460,330, 30, 30, bufdc, 0, 0, SRCCOPY);
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,490,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
 	//画己方坦克子弹
 	//int dir = myTank.GetDirection();
 	Bullet *b = myTank.GetBullet();			//子弹数组	
@@ -288,15 +388,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		//按下键盘开始游戏
 		case WM_LBUTTONDOWN:  		
-			if(isStart == true)
-				break;								
-			isStart = true;	
-			PlaySound("music.wav", NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);	    //播放背景音乐				
+			//if(isStart == true)
+				//break;								
+			//isStart = true;	
+			//PlaySound("music.wav", NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);	    //播放背景音乐				
 			break;
 
 		case WM_KEYDOWN:
 			switch (wParam)
 			{
+				case VK_RETURN:		//按下回车
+					if(isStart == false){					
+						if(triangelY == 90){			//开始游戏
+							isStart = true;
+							showExplain = false;
+						}else{
+							showExplain = true;
+						}
+					}
+					break;
+
 				case VK_ESCAPE:{
 					PostQuitMessage(0);
 				}
@@ -304,6 +415,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 				//坦克移动
 				case VK_UP:		{	
+					if(isStart == false){
+						triangelY = 90;
+						showExplain = false;
+						return 0;
+					}
 					myTank.SetDirection(TOP);
 					int x = myTank.GetX();
 					int y = myTank.GetY();
@@ -320,6 +436,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 				case VK_DOWN:
 					{	
+					if(isStart == false){
+						triangelY = 130;
+						return 0;
+					}
 					myTank.SetDirection(BOTTOM);
 					int x = myTank.GetX();
 					int y = myTank.GetY();
@@ -414,6 +534,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			break;
+
+			
 	case WM_DESTROY:{
 		int i;
 
