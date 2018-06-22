@@ -11,7 +11,7 @@
 #define OBSTACLE_NUMBER 40  //定义障碍物的个数
 
 HINSTANCE hInst;
-HBITMAP  bg,start,tankImg[4],bullet,obstacle1,obstacle2,triangle,explain;						//图片;						//图片
+HBITMAP  bg,start,tankImg[4],bullet,obstacle1,obstacle2,triangle,explain,scoreBackground;						//图片;						//图片
 HDC		hdc, mdc, bufdc;
 HWND	hWnd;
 DWORD	tPre, tNow;						//控制刷新频率
@@ -104,7 +104,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 
-	MoveWindow(hWnd, 10, 10, 640, 480, true);
+	MoveWindow(hWnd, 50, 50, 650, 480, true);
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
@@ -112,7 +112,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	mdc = CreateCompatibleDC(hdc);
 	bufdc = CreateCompatibleDC(hdc);
 
-	bmp = CreateCompatibleBitmap(hdc, 640, 480);
+	bmp = CreateCompatibleBitmap(hdc, 850, 480);
 	SelectObject(mdc, bmp);
 		
 
@@ -132,6 +132,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	bg = (HBITMAP)LoadImage(NULL, "bg.bmp", IMAGE_BITMAP, 650, 450, LR_LOADFROMFILE);				//背景		
 	triangle = (HBITMAP)LoadImage(NULL, "triangle.bmp", IMAGE_BITMAP, 20, 40, LR_LOADFROMFILE);				//三角形		
 	explain = (HBITMAP)LoadImage(NULL, "explain.bmp", IMAGE_BITMAP, 300, 400, LR_LOADFROMFILE);				//三角形		
+	scoreBackground = (HBITMAP)LoadImage(NULL, "scoreBackground.bmp", IMAGE_BITMAP, 200, 450, LR_LOADFROMFILE);				//评分系统		
 
 	MyPaint(hdc);					//调用绘图函数
 
@@ -210,8 +211,7 @@ BOOL isObstable(int tank_x,int tank_y)
 	return false;
 }
 void StartPaint(HDC hdc)
-{	
-	
+{		
 	if(isStart == false){
 		//贴开始界面
 		SelectObject(bufdc, start);
@@ -242,10 +242,12 @@ void MyPaint(HDC hdc)
 	if(isStart == false)
 		return;
 	
-	//绘图
+	MoveWindow(hWnd, 150, 100, 850, 480, true);
+
+	//绘背景图
 	SelectObject(bufdc, bg);
 	BitBlt(mdc, 0, 0, 650, 450, bufdc, 0, 0, SRCCOPY);					
-
+					
 
 	/*
 	 * 己方坦克（若后期修改背景图，需要修改坦克图）
@@ -402,12 +404,12 @@ void MyPaint(HDC hdc)
 		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 10, SRCAND);
 		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 0, SRCPAINT);
 	}
+		
+	//贴评分图
+	SelectObject(bufdc, scoreBackground);
+	BitBlt(mdc, 650, 0, 200, 450, bufdc, 0, 0, SRCCOPY);
 
-
-
-
-	//
-	BitBlt(hdc, 0, 0, 650, 450, mdc, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0, 850, 450, mdc, 0, 0, SRCCOPY);
 	tPre = GetTickCount();
 
 }
