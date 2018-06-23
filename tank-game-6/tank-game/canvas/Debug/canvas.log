@@ -1,4 +1,4 @@
-﻿生成启动时间为 2018/6/23 22:43:13。
+﻿生成启动时间为 2018/6/23 22:52:59。
      1>项目“E:\code\tank-game\tank-game-6\tank-game\canvas\canvas.vcxproj”在节点 2 上(Build 个目标)。
        项目文件包含 ToolsVersion="12.0"。此工具集可能未知或缺失(您可以通过安装相应版本的 MSBuild 来解决该问题)，或者该生成因策略原因已被强制更改为特殊 ToolsVersion。将此项目视作具有 ToolsVersion="4.0"。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkId=291333。
      1>ClCompile:
@@ -13,4 +13,4 @@
 
 生成成功。
 
-已用时间 00:00:02.76
+已用时间 00:00:03.30

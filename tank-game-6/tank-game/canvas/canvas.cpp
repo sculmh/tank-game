@@ -13,6 +13,7 @@
 
 HINSTANCE hInst;
 HBITMAP  bg,start,tankImg[4],tankImg_2[4],bullet,bullet_2,obstacle1,obstacle2,triangle,explain,scoreBackground,rewards,grass;						//图片;						//图片
+HBITMAP blood1,blood2;
 HDC		hdc, mdc, bufdc;
 HWND	hWnd;
 DWORD	tPre, tNow;						//控制刷新频率
@@ -50,9 +51,9 @@ Obstacle *reward=new Obstacle[REWARDS_NUMBER]; //设置奖励对象数组 记录奖励位置
 
 //为方便暂时作为全局变量
 //初始化的坦克1
-Tank myTank(100,100,LEFT,1);				//define left 2
+Tank myTank(100,100,LEFT,10);				//define left 2
 //初始化的坦克2
-Tank myTank_2(30,30,RIGHT,1);				//测试先将tank的生命值设置为1  当被子弹打到就消失
+Tank myTank_2(30,30,RIGHT,10);				//测试先将tank的生命值设置为1  当被子弹打到就消失
 
 
 int APIENTRY WinMain(HINSTANCE hInstance,
@@ -167,6 +168,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	explain = (HBITMAP)LoadImage(NULL, "explain.bmp", IMAGE_BITMAP, 300, 400, LR_LOADFROMFILE);				//三角形		
 	scoreBackground = (HBITMAP)LoadImage(NULL, "scoreBackground.bmp", IMAGE_BITMAP, 200, 450, LR_LOADFROMFILE);		
 	grass = (HBITMAP)LoadImage(NULL, "grass.bmp", IMAGE_BITMAP, 30, 30, LR_LOADFROMFILE);		
+	blood1 = (HBITMAP)LoadImage(NULL, "blood.bmp", IMAGE_BITMAP, 100, 10, LR_LOADFROMFILE);		
+	blood2 = (HBITMAP)LoadImage(NULL, "blood.bmp", IMAGE_BITMAP, 100, 10, LR_LOADFROMFILE);		
 	MyPaint(hdc);					//调用绘图函数
 
 	return TRUE;
@@ -483,6 +486,12 @@ void DrawGrass(){
 	BitBlt(mdc, 90, 60, 30, 30, bufdc, 0, 0, SRCCOPY);
 	BitBlt(mdc, 120, 60, 30, 30, bufdc, 0, 0, SRCCOPY);
 }
+
+void DrawBlood(){
+	SelectObject(bufdc,blood1);
+	BitBlt(mdc, 730,100, myTank.GetTankValue()*10, 10, bufdc, 0, 0, SRCCOPY);
+	BitBlt(mdc, 730,140, myTank_2.GetTankValue()*10, 10, bufdc, 0, 0, SRCCOPY);
+}
 void MyPaint(HDC hdc)
 {				
 	if(isStart == false)
@@ -535,6 +544,8 @@ void MyPaint(HDC hdc)
 	 */
      
 	DrawGrass();			//贴草图
+
+	
 	
 	SelectObject(bufdc,obstacle1);                               //贴第一行障碍 8个
 	BitBlt(mdc,130, 150, 30, 30, bufdc, 0, 0, SRCCOPY);	
@@ -803,6 +814,8 @@ void MyPaint(HDC hdc)
 	//贴评分图
 	SelectObject(bufdc, scoreBackground);
 	BitBlt(mdc, 650, 0, 200, 450, bufdc, 0, 0, SRCCOPY);
+
+	DrawBlood();			//贴血量图
 
 	BitBlt(hdc, 0, 0, 850, 450, mdc, 0, 0, SRCCOPY);
 	tPre = GetTickCount();
