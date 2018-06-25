@@ -9,7 +9,7 @@
 #include "mmsystem.h"//导入声音头文件
 #pragma comment(lib,"winmm.lib")//导入声音头文件库
 #define OBSTACLE_NUMBER 40  //定义障碍物的个数
-#define REWARDS_NUMBER 1
+#define REWARDS_NUMBER 8
 
 HINSTANCE hInst;
 HBITMAP  bg,start,tankImg[4],tankImg_2[4],bullet,bullet_2,obstacle1,obstacle2,triangle,explain,scoreBackground,rewards,grass;						//图片;						//图片
@@ -35,15 +35,18 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 void				MyPaint(HDC hdc);		
 void				StartPaint(HDC hdc);
 BOOL isObstable(int tank_x,int tank_y);
-BOOL isRewards_1(int tank_x,int tank_y);   //吃到奖品加生命值
+BOOL isRewards_1(int tank_x,int tank_y);   //2吃到奖品加生命值
+BOOL isRewards_2(int tank_x,int tank_y);   //2吃到奖品加生命值
 
-void tank1_Shot(int bx,int by,int ii);  //坦克1(绿色)被子弹击中  子弹的坐标
-void tank2_Shot(int bx_2,int by_2,int i_2);  //坦克2(绿色)被子弹击中  子弹的坐标 
 void setObstacle();  //设置障碍对象数组的各个参数  障碍位置和生命值
 void setReward();  //设置奖励数组的各个参数  位置
-void tank1_beatObstacle(int bx, int by,int ii);  //坦克1子弹 击中障碍
-void tank2_beatObstacle(int bx_2, int by_2,int ii_2);  //坦克2的子弹 击中障碍
+void tank2_Shot_tank1beatObstacle(int bx, int by,int ii);  //坦克1的子弹
+void tan1Shot_tank2beatObstacle(int bx_2, int by_2,int ii_2);  //坦克2的子弹
 
+
+//贴图
+void DrawObstacle();
+void DrawGrass();
 
 
 Obstacle *obstacle=new Obstacle[OBSTACLE_NUMBER]; //设置障碍对象数组 记录障碍位置和生命值
@@ -175,87 +178,48 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
-void tank1_Shot(int bx,int by,int ii)    //坦克1(绿色)被子弹击中  子弹的坐标
-{
-	Bullet *b_2 = myTank_2.GetBullet();	
-	int tank_x=myTank.GetX();
-	int tank_y=myTank.GetY();
-		Bullet temp = b_2[ii];	
-		if(temp.exist == false)
-			return;
-		if(temp.GetX()>=tank_x && temp.GetX()<=(tank_x+30) && temp.GetY()>=tank_y && temp.GetY()<=(tank_y+30))
-	  {
-		myTank.ReduceTankValue();
-	    b_2[ii].exist=false;
-		return;
-	  }
-		else if((temp.GetX()+30)>=tank_x && (temp.GetX()+30)<=(tank_x+30) && temp.GetY()>=tank_y && temp.GetY()<=(tank_y+30))
-		{
-			myTank.ReduceTankValue();
-	        b_2[ii].exist=false;
-		  return;
 
-		}
-		else if((temp.GetX()+30)>=tank_x && (temp.GetX()+30)<=(tank_x+30) && (temp.GetY()+30)>=tank_y && (temp.GetY()+30)<=(tank_y+30))
-		{
-		
-			myTank.ReduceTankValue();
-	        b_2[ii].exist=false;
-		   return;
-		}
-	    else if(temp.GetX()>=tank_x && temp.GetX()<=(tank_x+30) && (temp.GetY()+30)>=tank_y && (temp.GetY()+30)<=(tank_y+30))
-	   {
-		  myTank.ReduceTankValue();
-	      b_2[ii].exist=false;
-		 return;
-	   }
-
-
-}
-
-void tank2_Shot(int bx_2,int by_2,int i_2)   //坦克2 被坦克1 击中   子弹坐标 和子弹数组下标
+void tank2_Shot_tank1beatObstacle(int bx, int by,int ii)   // 都是坦克一的子弹坦克2 被坦克1 击中   子弹坐标 和子弹数组下标
 {
 	Bullet *b = myTank.GetBullet();	
 	int tank_x=myTank_2.GetX();
 	int tank_y=myTank_2.GetY();
-		Bullet temp = b[i_2];	
+	int i;
+	Bullet temp = b[ii];	
+		for(i=0;i<1;i++)
+		{
 		if(temp.exist == false)
-			return;
+			break;
 		if(temp.GetX()>=tank_x && temp.GetX()<=(tank_x+30) && temp.GetY()>=tank_y && temp.GetY()<=(tank_y+30))
 	  {
 		myTank_2.ReduceTankValue();
-	    b[i_2].exist=false;
-		return;
+	    b[ii].exist=false;
+		break;
 	  }
 		else if((temp.GetX()+30)>=tank_x && (temp.GetX()+30)<=(tank_x+30) && temp.GetY()>=tank_y && temp.GetY()<=(tank_y+30))
 		{
 			myTank_2.ReduceTankValue();
-	         b[i_2].exist=false;
-		  return;
+	         b[ii].exist=false;
+		  break;
 
 		}
 		else if((temp.GetX()+30)>=tank_x && (temp.GetX()+30)<=(tank_x+30) && (temp.GetY()+30)>=tank_y && (temp.GetY()+30)<=(tank_y+30))
 		{
 		
 			myTank_2.ReduceTankValue();
-	        b[i_2].exist=false;
-		   return;
+	        b[ii].exist=false;
+		   break;
 		}
 	    else if(temp.GetX()>=tank_x && temp.GetX()<=(tank_x+30) && (temp.GetY()+30)>=tank_y && (temp.GetY()+30)<=(tank_y+30))
 	   {
 		  myTank_2.ReduceTankValue();
-	       b[i_2].exist=false;
-		 return;
+	       b[ii].exist=false;
+		   break;
 	   }
-
-}
-
-void tank1_beatObstacle(int bx, int by,int ii)  //坦克1的子弹 击中障碍
-{
-	Bullet *b = myTank.GetBullet();	
-	Bullet temp = b[ii];	
-	for(int i=0;i<OBSTACLE_NUMBER;i++)
-	{
+		}
+	
+		for(i=0;i<OBSTACLE_NUMBER;i++)
+	  {
 		if(temp.exist == false)
 			continue;
 		if(temp.GetX()>=obstacle[i].GetOX() && temp.GetX()<=(obstacle[i].GetOX()+30) && temp.GetY()>=obstacle[i].GetOY() && temp.GetY()<=(obstacle[i].GetOY()+30))
@@ -286,27 +250,62 @@ void tank1_beatObstacle(int bx, int by,int ii)  //坦克1的子弹 击中障碍
 	   }
 	}
 
-
 }
 
-void tank2_beatObstacle(int bx_2, int by_2,int ii_2)  //坦克2的子弹 击中障碍
+
+void tan1Shot_tank2beatObstacle(int bx_2, int by_2,int ii_2)  //坦克2的子弹 击中障碍 坦克1被坦克2子弹打中
 {
-	Bullet *b = myTank_2.GetBullet();	
-	Bullet temp = b[ii_2];	
-	for(int i=0;i<OBSTACLE_NUMBER;i++)
+	Bullet *b_2 = myTank_2.GetBullet();	
+	int tank_x=myTank.GetX();
+	int tank_y=myTank.GetY();
+	Bullet temp = b_2[ii_2];	
+	int i;
+	for(i=0;i<1;i++)
+	{
+	   if(temp.exist == false)
+			break;
+		if(temp.GetX()>=tank_x && temp.GetX()<=(tank_x+30) && temp.GetY()>=tank_y && temp.GetY()<=(tank_y+30))
+	  {
+		myTank.ReduceTankValue();
+	    b_2[ii_2].exist=false;
+		break;
+	  }
+		else if((temp.GetX()+30)>=tank_x && (temp.GetX()+30)<=(tank_x+30) && temp.GetY()>=tank_y && temp.GetY()<=(tank_y+30))
+		{
+			myTank.ReduceTankValue();
+	        b_2[ii_2].exist=false;
+		  break;
+
+		}
+		else if((temp.GetX()+30)>=tank_x && (temp.GetX()+30)<=(tank_x+30) && (temp.GetY()+30)>=tank_y && (temp.GetY()+30)<=(tank_y+30))
+		{
+		
+			myTank.ReduceTankValue();
+	        b_2[ii_2].exist=false;
+		  break;
+		}
+	    else if(temp.GetX()>=tank_x && temp.GetX()<=(tank_x+30) && (temp.GetY()+30)>=tank_y && (temp.GetY()+30)<=(tank_y+30))
+	   {
+		  myTank.ReduceTankValue();
+	      b_2[ii_2].exist=false;
+		break;
+	   }
+	}
+
+	for(i=0;i<OBSTACLE_NUMBER;i++)
 	{
 		if(temp.exist == false)
 			continue;
 		if(temp.GetX()>=obstacle[i].GetOX() && temp.GetX()<=(obstacle[i].GetOX()+30) && temp.GetY()>=obstacle[i].GetOY() && temp.GetY()<=(obstacle[i].GetOY()+30))
 	  {
 		  obstacle[i].ReduceObstacleValue();
-	      b[ii_2].exist=false;
+	      b_2[ii_2].exist=false;
 		  continue;
 	  }
 		else if((temp.GetX()+30)>=obstacle[i].GetOX() && (temp.GetX()+30)<=(obstacle[i].GetOX()+30) && temp.GetY()>=obstacle[i].GetOY() && temp.GetY()<=(obstacle[i].GetOY()+30))
 		{
 			obstacle[i].ReduceObstacleValue();
-	         b[ii_2].exist=false;
+	         b_2[ii_2].exist=false;
 		    continue;
 
 		}
@@ -314,13 +313,13 @@ void tank2_beatObstacle(int bx_2, int by_2,int ii_2)  //坦克2的子弹 击中障碍
 		{
 		
 			obstacle[i].ReduceObstacleValue();
-	        b[ii_2].exist=false;
+	        b_2[ii_2].exist=false;
 		   continue;
 		}
 	    else if(temp.GetX()>=obstacle[i].GetOX() && temp.GetX()<=(obstacle[i].GetOX()+30) && (temp.GetY()+30)>=obstacle[i].GetOY() && (temp.GetY()+30)<=(obstacle[i].GetOY()+30))
 	   {
 		  obstacle[i].ReduceObstacleValue();
-	       b[ii_2].exist=false;
+	       b_2[ii_2].exist=false;
 		 continue;
 	   }
 	}
@@ -385,6 +384,16 @@ void setObstacle()
 void setReward()
 {
 	reward[0].Set(340,150);
+	reward[1].Set(430,180);
+	reward[2].Set(190,270);
+	reward[3].Set(280,240);
+	reward[4].Set(430,270);
+	reward[5].Set(190,300);
+	reward[6].Set(280,330);
+	reward[7].Set(490,330);
+	//reward[8].Set(340,150);
+
+
 }
 BOOL isObstable(int tank_x,int tank_y)
 {
@@ -423,24 +432,66 @@ BOOL isRewards_1(int tank_x,int tank_y)  //1 吃到奖品加生命值
 		{
 			myTank.AddTankValue();
 			reward_exit=false;
+			reward[i].Set(130,150);  //
 			return true;
 		}
 		else if((tank_x+30)>=reward[i].GetOX() && (tank_x+30)<=(reward[i].GetOX()+30) && tank_y>=reward[i].GetOY() && tank_y<=(reward[i].GetOY()+30))
 		{
 			myTank.AddTankValue();
 			reward_exit=false;
+			reward[i].Set(130,150);  //
 			return true;
 		}
 		else if((tank_x+30)>=reward[i].GetOX() && (tank_x+30)<=(reward[i].GetOX()+30) && (tank_y+30)>=reward[i].GetOY() && (tank_y+30)<=(reward[i].GetOY()+30))
 		{
 			myTank.AddTankValue();
 			reward_exit=false;
+			reward[i].Set(130,150);  //
 			return true;
 		}
 	    else if(tank_x>=reward[i].GetOX() && tank_x<=(reward[i].GetOX()+30) && (tank_y+30)>=reward[i].GetOY() && (tank_y+30)<=(reward[i].GetOY()+30))
 		{
 			myTank.AddTankValue();
 			reward_exit=false;
+			reward[i].Set(130,150);  //
+			return true;
+		}
+		
+	}
+	return false;
+}
+
+BOOL isRewards_2(int tank_x,int tank_y)  //1 吃到奖品加生命值
+{
+
+	for(int i=0;i<REWARDS_NUMBER;i++)
+	{
+		if(tank_x>=reward[i].GetOX() && tank_x<=(reward[i].GetOX()+30) && tank_y>=reward[i].GetOY() && tank_y<=(reward[i].GetOY()+30))
+		{
+			myTank_2.AddTankValue();
+			reward_exit=false;
+			reward[i].Set(130,150);  //
+			return true;
+		}
+		else if((tank_x+30)>=reward[i].GetOX() && (tank_x+30)<=(reward[i].GetOX()+30) && tank_y>=reward[i].GetOY() && tank_y<=(reward[i].GetOY()+30))
+		{
+			myTank_2.AddTankValue();
+			reward_exit=false;
+			reward[i].Set(130,150);  //
+			return true;
+		}
+		else if((tank_x+30)>=reward[i].GetOX() && (tank_x+30)<=(reward[i].GetOX()+30) && (tank_y+30)>=reward[i].GetOY() && (tank_y+30)<=(reward[i].GetOY()+30))
+		{
+			myTank_2.AddTankValue();
+			reward_exit=false;
+			reward[i].Set(130,150);  //
+			return true;
+		}
+	    else if(tank_x>=reward[i].GetOX() && tank_x<=(reward[i].GetOX()+30) && (tank_y+30)>=reward[i].GetOY() && (tank_y+30)<=(reward[i].GetOY()+30))
+		{
+			myTank_2.AddTankValue();
+			reward_exit=false;
+			reward[i].Set(130,150);  //
 			return true;
 		}
 		
@@ -491,6 +542,196 @@ void DrawBlood(){
 	SelectObject(bufdc,blood1);
 	BitBlt(mdc, 730,100, myTank.GetTankValue()*10, 10, bufdc, 0, 0, SRCCOPY);
 	BitBlt(mdc, 730,140, myTank_2.GetTankValue()*10, 10, bufdc, 0, 0, SRCCOPY);
+}
+
+void DrawObstacle()
+{
+	SelectObject(bufdc,obstacle1);                               //贴第一行障碍 8个
+	BitBlt(mdc,130, 150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,160,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,190,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,310,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+	if(obstacle[5].GetValue()>0)           //能被打掉的障碍  
+	{
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,340,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	}
+	else if(obstacle[5].GetValue()<=0)  
+	{
+		obstacle[5].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,340,150, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
+																	//贴第二行障碍 4个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,130,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+	if(obstacle[10].GetValue()>0)
+	{
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,430,180, 30, 30, bufdc, 0, 0, SRCCOPY);	}
+	else if(obstacle[10].GetValue()<=0)  
+	{
+		obstacle[10].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,430,180, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+																	//贴第二'行障碍 4个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,130,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+																	//贴第三行障碍 6个
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,130,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,160,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,190,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+	if(obstacle[15].GetValue()>0)
+	{
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,280,240, 30, 30, bufdc, 0, 0, SRCCOPY);	}
+	else if(obstacle[15].GetValue()<=0)  
+	{
+		obstacle[15].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,280,240, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
+																	//贴第四行障碍 4个
+
+	if(obstacle[18].GetValue()>0)
+	{
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,190,270, 30, 30, bufdc, 0, 0, SRCCOPY);}
+	else if(obstacle[18].GetValue()<=0)  
+	{
+		obstacle[18].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,190,270, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+	if(obstacle[20].GetValue()>0)
+	{
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,430,270, 30, 30, bufdc, 0, 0, SRCCOPY);	}
+	else if(obstacle[20].GetValue()<=0)  
+	{
+		obstacle[20].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,430,270, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
+
+	if(obstacle[35].GetValue()>0)
+	{																	//贴第四'行障碍 4个
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,190,300, 30, 30, bufdc, 0, 0, SRCCOPY);	}
+	else if(obstacle[35].GetValue()<=0)  
+	{
+		obstacle[35].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,190,300, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,280,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle);
+	BitBlt(mdc,430,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
+																	//贴第五行障碍9个
+	SelectObject(bufdc,obstacle1);                               
+	BitBlt(mdc,130, 330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,160,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,190,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	if(obstacle[25].GetValue()>0)
+	{	
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,280,330, 30, 30, bufdc, 0, 0, SRCCOPY);	}
+	else if(obstacle[25].GetValue()<=0)  
+	{
+		obstacle[25].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,280,330,30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,310,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,340,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,430,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,460,330, 30, 30, bufdc, 0, 0, SRCCOPY);
+
+	if(obstacle[30].GetValue()>0)
+	{	
+	SelectObject(bufdc,obstacle2);
+	BitBlt(mdc,490,330, 30, 30, bufdc, 0, 0, SRCCOPY);	}
+	else if(obstacle[35].GetValue()<=0)  
+	{
+		obstacle[35].Set(130, 150);
+		if(reward_exit) 
+		{
+			SelectObject(bufdc,rewards);  //打掉障碍就贴奖品
+			BitBlt(mdc,490,330, 30, 30, bufdc, 0, 0, SRCCOPY);
+		}
+	}
+	SelectObject(bufdc,obstacle1);
+	BitBlt(mdc,520,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
 }
 void MyPaint(HDC hdc)
 {				
@@ -544,162 +785,7 @@ void MyPaint(HDC hdc)
 	 */
      
 	DrawGrass();			//贴草图
-
-	
-	
-	SelectObject(bufdc,obstacle1);                               //贴第一行障碍 8个
-	BitBlt(mdc,130, 150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,160,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,190,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,280,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,310,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-	if(obstacle[5].GetValue()>0)           //能被打掉的障碍  
-	{
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,340,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	}
-	else
-	{
-		obstacle[5].Set(130, 150);
-		if(reward_exit) 
-		{
-			SelectObject(bufdc,rewards);  //贴奖品
-			BitBlt(mdc,340,150, 30, 30, bufdc, 0, 0, SRCCOPY);
-		}
-	}
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,430,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,150, 30, 30, bufdc, 0, 0, SRCCOPY);	
-																	//贴第二行障碍 4个
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,130,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,280,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-	if(obstacle[10].GetValue()>0)
-	{
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,430,180, 30, 30, bufdc, 0, 0, SRCCOPY);	}
-	else
-	{
-		obstacle[10].Set(130, 150);
-	}
-
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,180, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-																	//贴第二'行障碍 4个
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,130,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,280,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,430,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,210, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-																	//贴第三行障碍 6个
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,130,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,160,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,190,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-	if(obstacle[15].GetValue()>0)
-	{
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,280,240, 30, 30, bufdc, 0, 0, SRCCOPY);	}
-	else
-	{
-		obstacle[15].Set(130, 150);
-	}
-
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,430,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,240, 30, 30, bufdc, 0, 0, SRCCOPY);	
-																	//贴第四行障碍 4个
-
-	if(obstacle[18].GetValue()>0)
-	{
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,190,270, 30, 30, bufdc, 0, 0, SRCCOPY);}
-	else
-	{
-		obstacle[18].Set(130, 150);
-	}
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,280,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-	if(obstacle[20].GetValue()>0)
-	{
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,430,270, 30, 30, bufdc, 0, 0, SRCCOPY);	}
-	else
-	{
-		obstacle[20].Set(130, 150);
-	}
-
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,270, 30, 30, bufdc, 0, 0, SRCCOPY);	
-
-	if(obstacle[35].GetValue()>0)
-	{																	//贴第四'行障碍 4个
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,190,300, 30, 30, bufdc, 0, 0, SRCCOPY);	}
-	else
-	{
-		obstacle[35].Set(130, 150);
-	}
-
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,280,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle);
-	BitBlt(mdc,430,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,300, 30, 30, bufdc, 0, 0, SRCCOPY);	
-																	//贴第五行障碍9个
-	SelectObject(bufdc,obstacle1);                               
-	BitBlt(mdc,130, 330, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,160,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,190,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	if(obstacle[25].GetValue()>0)
-	{	
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,280,330, 30, 30, bufdc, 0, 0, SRCCOPY);	}
-	else
-	{
-		obstacle[25].Set(130, 150);
-	}
-
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,310,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,340,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,430,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,460,330, 30, 30, bufdc, 0, 0, SRCCOPY);
-
-	if(obstacle[30].GetValue()>0)
-	{	
-	SelectObject(bufdc,obstacle2);
-	BitBlt(mdc,490,330, 30, 30, bufdc, 0, 0, SRCCOPY);	}
-	else
-	{
-		obstacle[30].Set(130, 150);
-	}
-	SelectObject(bufdc,obstacle1);
-	BitBlt(mdc,520,330, 30, 30, bufdc, 0, 0, SRCCOPY);	
+	DrawObstacle();    //贴障碍
 
 	//画坦克1子弹
 	//int dir = myTank.GetDirection();
@@ -748,12 +834,11 @@ void MyPaint(HDC hdc)
 		}
 
 		//贴子弹
-
+		tank2_Shot_tank1beatObstacle(bx,by,i);  //修改了一下 合并了两个
 		SelectObject(bufdc, bullet);
 		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 10, SRCAND);
 		BitBlt(mdc, bx, by, 10, 10, bufdc, 0, 0, SRCPAINT);
-		tank2_Shot(bx,by,i);
-		tank1_beatObstacle(bx,by,i);		
+        
 	}
 
 	//画坦克2子弹
@@ -803,11 +888,11 @@ void MyPaint(HDC hdc)
 		}
 
 		//贴子弹
+		tan1Shot_tank2beatObstacle(bx_2,by_2,i);
 		SelectObject(bufdc, bullet_2);
 		BitBlt(mdc, bx_2, by_2, 10, 10, bufdc, 0, 10, SRCAND);   //去掉子弹的黑色背景
 		BitBlt(mdc, bx_2, by_2, 10, 10, bufdc, 0, 0, SRCPAINT);
-		tank1_Shot(bx_2,by_2,i);
-		tank2_beatObstacle(bx_2,by_2,i);
+
 	
 	}
 
@@ -884,7 +969,7 @@ void tank2_Move(){
 					int x_2 = myTank_2.GetX();
 					int y_2 = myTank_2.GetY();
 					y_2 -= tempSpeed;
-					if(isObstable(x_2,y_2))
+					if(isObstable(x_2,y_2)||isRewards_2(x_2,y_2))
 					{
 						y_2+=tempSpeed;				//是障碍就不移动
 					}
@@ -896,7 +981,7 @@ void tank2_Move(){
 					int x_2 = myTank_2.GetX();
 					int y_2 = myTank_2.GetY();
 					y_2 += tempSpeed;				//移动速度
-					if(isObstable(x_2,y_2))
+					if(isObstable(x_2,y_2)||isRewards_2(x_2,y_2))
 					{
 						y_2-=tempSpeed;				//是障碍就不移动
 					}
@@ -908,7 +993,7 @@ void tank2_Move(){
 					int x_2 = myTank_2.GetX();
 					int y_2 = myTank_2.GetY();
 					x_2 -= tempSpeed;				//移动速度
-					if(isObstable(x_2,y_2))
+					if(isObstable(x_2,y_2)||isRewards_2(x_2,y_2))
 					{
 						x_2+=tempSpeed;				//是障碍就不移动
 					}
@@ -920,7 +1005,7 @@ void tank2_Move(){
 					int x_2 = myTank_2.GetX();
 					int y_2 = myTank_2.GetY();
 					x_2 += tempSpeed;				//移动速度
-					if(isObstable(x_2,y_2))
+					if(isObstable(x_2,y_2)||isRewards_2(x_2,y_2))
 					{
 						x_2-=tempSpeed;				//是障碍就不移动
 					}
@@ -1266,5 +1351,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
+
 
 
